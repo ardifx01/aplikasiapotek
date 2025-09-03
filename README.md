@@ -1,15 +1,20 @@
-# Free Bootstrap Admin Template 
-Stisla is Free Bootstrap Admin Template and will help you to speed up your project, design your own dashboard UI and the users will love it.
+# Aplikasi Manajemen Apotek
 
-More info: https://getstisla.com
+Aplikasi ini adalah sistem manajemen apotek bebas digunakan
+Aplikasi ini dibuat menggunakan PHP, MySQL, dan Bootstrap template Stisla, untuk memudahkan pengelolaan data obat, resep, dan transaksi apotek.
 
-![Stisla Preview](https://i.ibb.co/6tdmcX0/2018-11-11-15-35-getstisla-com.png)
+## Fitur Utama
+- Manajemen data obat (tambah, edit, hapus)
+- Laporan penjualan obat
+- Manajemen stok obat
+- Sistem login user dengan hak akses
 
-# Roadmap
-You can find the Stisla road map here: https://trello.com/b/M8TMnehE/stisla-roadmap
+## Cara Menjalankan
+1. Pastikan **XAMPP** atau server lokal sudah berjalan.  
+2. Letakkan folder proyek di `htdocs` (misal: `/Applications/XAMPP/htdocs/apotek`)  
+3. Import database `apotek.sql` ke MySQL  
+4. Buka browser dan akses: `http://localhost/apotek`  
 
-# Contributing
-The contribution guide is still in progress :)
-
-# License
-Stisla is under the MIT license
+## Lisensi
+Aplikasi ini bebas untuk di gunakan, dengan sayarat tidak boleh di perjualbelikan , untuk ke depannya konsisten selalu di lakukan pengembengan sesuai kebutuhan.
+Info : 082177846209
