@@ -1,0 +1,311 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+include 'koneksi.php';
+date_default_timezone_set('Asia/Jakarta');
+
+// --- HANDLE SIMPAN / UPDATE OBAT ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aksi'])) {
+    $aksi       = $_POST['aksi'];
+    $id         = isset($_POST['id']) ? (int) $_POST['id'] : 0;
+    $kode_obat  = mysqli_real_escape_string($conn, $_POST['kode_obat']);
+    $nama_obat  = mysqli_real_escape_string($conn, $_POST['nama_obat']);
+    $kategori   = mysqli_real_escape_string($conn, $_POST['kategori']);
+    $satuan     = mysqli_real_escape_string($conn, $_POST['satuan']);
+    $harga_beli = (float) $_POST['harga_beli'];
+    $harga_jual = (float) $_POST['harga_jual'];
+    $stok       = (int) $_POST['stok'];
+
+    if ($aksi === 'tambah') {
+        $stmt = $conn->prepare("INSERT INTO obat (kode_obat, nama_obat, kategori, satuan, harga_beli, harga_jual, stok) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssddii", $kode_obat, $nama_obat, $kategori, $satuan, $harga_beli, $harga_jual, $stok);
+        $stmt->execute();
+        $stmt->close();
+    } elseif ($aksi === 'edit') {
+        $stmt = $conn->prepare("UPDATE obat SET kode_obat=?, nama_obat=?, kategori=?, satuan=?, harga_beli=?, harga_jual=?, stok=? WHERE id=?");
+        $stmt->bind_param("sssddii", $kode_obat, $nama_obat, $kategori, $satuan, $harga_beli, $harga_jual, $stok, $id);
+        $stmt->execute();
+        $stmt->close();
+    }
+    header("Location: data_obat.php");
+    exit;
+}
+
+// --- HANDLE HAPUS OBAT ---
+if (isset($_GET['hapus'])) {
+    $id = (int) $_GET['hapus'];
+    mysqli_query($conn, "DELETE FROM obat WHERE id='$id'");
+    header("Location: data_obat.php");
+    exit;
+}
+
+// --- GENERATE KODE OBAT OTOMATIS ---
+$result = mysqli_query($conn, "SELECT kode_obat FROM obat ORDER BY id DESC LIMIT 1");
+$last = mysqli_fetch_assoc($result);
+$lastKode = $last ? intval(substr($last['kode_obat'], 3)) : 0;
+$kode_otomatis = "OBT" . str_pad($lastKode + 1, 4, "0", STR_PAD_LEFT);
+
+// --- AMBIL DATA OBAT ---
+$obat = mysqli_query($conn, "SELECT * FROM obat ORDER BY nama_obat ASC");
+
+// --- AMBIL MASTER KATEGORI DAN SATUAN ---
+$kategori_list = mysqli_query($conn, "SELECT nama_kategori FROM master_kategori ORDER BY nama_kategori ASC");
+$satuan_list   = mysqli_query($conn, "SELECT nama_satuan FROM master_satuan ORDER BY nama_satuan ASC");
+
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport" />
+<title>Data Obat &mdash; Apotek-KU</title>
+<link rel="stylesheet" href="assets/modules/bootstrap/css/bootstrap.min.css" />
+<link rel="stylesheet" href="assets/modules/fontawesome/css/all.min.css" />
+<link rel="stylesheet" href="assets/css/style.css" />
+<link rel="stylesheet" href="assets/css/components.css" />
+<style>
+.form-horizontal .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.form-horizontal .form-group label {
+    width: 140px;
+    margin-bottom: 0;
+    font-weight: 500;
+}
+.form-horizontal .form-group .input-group {
+    flex: 1;
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="main-wrapper main-wrapper-1">
+    <?php include 'navbar.php'; ?>
+    <?php include 'sidebar.php'; ?>
+
+    <div class="main-content">
+      <section class="section">
+        <div class="section-body">
+
+          <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h4>Data Obat</h4>
+              <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalTambah">
+                <i class="fas fa-plus"></i> Tambah Obat
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered table-sm table-hover">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>No</th>
+                      <th>Kode Obat</th>
+                      <th>Nama Obat</th>
+                      <th>Kategori</th>
+                      <th>Satuan</th>
+                      <th>Harga Beli</th>
+                      <th>Harga Jual</th>
+                      <th>Stok</th>
+                      <th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php
+                    $no = 1;
+                    while ($row = mysqli_fetch_assoc($obat)) {
+                        echo "<tr>
+                        <td>".$no++."</td>
+                        <td>".$row['kode_obat']."</td>
+                        <td>".$row['nama_obat']."</td>
+                        <td>".$row['kategori']."</td>
+                        <td>".$row['satuan']."</td>
+                        <td>Rp ".number_format($row['harga_beli'],0,',','.')."</td>
+                        <td>Rp ".number_format($row['harga_jual'],0,',','.')."</td>
+                        <td>".$row['stok']."</td>
+                        <td>
+                          <button class='btn btn-warning btn-sm btn-edit'
+                            data-id='".$row['id']."'
+                            data-kode='".$row['kode_obat']."'
+                            data-nama='".$row['nama_obat']."'
+                            data-kategori='".$row['kategori']."'
+                            data-satuan='".$row['satuan']."'
+                            data-beli='".$row['harga_beli']."'
+                            data-jual='".$row['harga_jual']."'
+                            data-stok='".$row['stok']."'>
+                            <i class='fas fa-edit'></i>
+                          </button>
+                          <a href='data_obat.php?hapus=".$row['id']."' class='btn btn-danger btn-sm' onclick=\"return confirm('Yakin hapus obat ini?');\">
+                            <i class='fas fa-trash'></i>
+                          </a>
+                        </td>
+                        </tr>";
+                    }
+                    ?>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        
+
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Tambah -->
+<div class="modal fade" id="modalTambah" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <form method="POST" class="modal-content form-horizontal">
+      <input type="hidden" name="aksi" value="tambah">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-plus"></i> Tambah Obat</h5>
+        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Kode Obat</label>
+          <input type="text" name="kode_obat" class="form-control" value="<?= $kode_otomatis ?>" readonly>
+        </div>
+        <div class="form-group">
+          <label>Nama Obat</label>
+          <input type="text" name="nama_obat" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Kategori</label>
+          <select name="kategori" class="form-control" required>
+            <option value="">-- Pilih Kategori --</option>
+            <?php 
+            mysqli_data_seek($kategori_list,0);
+            while($kat = mysqli_fetch_assoc($kategori_list)) { ?>
+              <option value="<?= $kat['nama_kategori'] ?>"><?= $kat['nama_kategori'] ?></option>
+            <?php } ?>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Satuan</label>
+          <select name="satuan" class="form-control" required>
+            <option value="">-- Pilih Satuan --</option>
+            <?php 
+            mysqli_data_seek($satuan_list,0);
+            while($sat = mysqli_fetch_assoc($satuan_list)) { ?>
+              <option value="<?= $sat['nama_satuan'] ?>"><?= $sat['nama_satuan'] ?></option>
+            <?php } ?>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Harga Beli</label>
+          <input type="number" name="harga_beli" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Harga Jual</label>
+          <input type="number" name="harga_jual" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Stok Awal</label>
+          <input type="number" name="stok" class="form-control" value="0" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Edit -->
+<div class="modal fade" id="modalEdit" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <form method="POST" class="modal-content form-horizontal">
+      <input type="hidden" name="aksi" value="edit">
+      <input type="hidden" name="id" id="edit-id">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-edit"></i> Edit Obat</h5>
+        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Kode Obat</label>
+          <input type="text" name="kode_obat" id="edit-kode" class="form-control" readonly>
+        </div>
+        <div class="form-group">
+          <label>Nama Obat</label>
+          <input type="text" name="nama_obat" id="edit-nama" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Kategori</label>
+          <select name="kategori" id="edit-kategori" class="form-control" required>
+            <option value="">-- Pilih Kategori --</option>
+            <?php 
+            mysqli_data_seek($kategori_list,0);
+            while($kat = mysqli_fetch_assoc($kategori_list)) { ?>
+              <option value="<?= $kat['nama_kategori'] ?>"><?= $kat['nama_kategori'] ?></option>
+            <?php } ?>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Satuan</label>
+          <select name="satuan" id="edit-satuan" class="form-control" required>
+            <option value="">-- Pilih Satuan --</option>
+            <?php 
+            mysqli_data_seek($satuan_list,0);
+            while($sat = mysqli_fetch_assoc($satuan_list)) { ?>
+              <option value="<?= $sat['nama_satuan'] ?>"><?= $sat['nama_satuan'] ?></option>
+            <?php } ?>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Harga Beli</label>
+          <input type="number" name="harga_beli" id="edit-beli" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Harga Jual</label>
+          <input type="number" name="harga_jual" id="edit-jual" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Stok</label>
+          <input type="number" name="stok" id="edit-stok" class="form-control" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+  <script src="assets/modules/jquery.min.js"></script>
+  <script src="assets/modules/popper.js"></script>
+  <script src="assets/modules/bootstrap/js/bootstrap.min.js"></script>
+  <script src="assets/modules/nicescroll/jquery.nicescroll.min.js"></script>
+  <script src="assets/modules/moment.min.js"></script>
+  <script src="assets/js/stisla.js"></script>
+  <script src="assets/js/scripts.js"></script>
+  <script src="assets/js/custom.js"></script>
+<script>
+$(document).on("click", ".btn-edit", function () {
+    $("#edit-id").val($(this).data("id"));
+    $("#edit-kode").val($(this).data("kode"));
+    $("#edit-nama").val($(this).data("nama"));
+    $("#edit-kategori").val($(this).data("kategori"));
+    $("#edit-satuan").val($(this).data("satuan"));
+    $("#edit-beli").val($(this).data("beli"));
+    $("#edit-jual").val($(this).data("jual"));
+    $("#edit-stok").val($(this).data("stok"));
+    $("#modalEdit").modal('show');
+});
+</script>
+</body>
+</html>
