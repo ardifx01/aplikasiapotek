@@ -20,7 +20,7 @@
     }
 
     body {
-      background: url('images/back1.jpg') no-repeat center center fixed;
+      background: url('images/back2.jpg') no-repeat center center fixed;
       background-size: cover;
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
@@ -94,10 +94,9 @@
 
   <div class="login-box">
     <div class="login-logo">
-      <img src="images/logo4.png" alt="Logo PMJ">
+      <img src="images/logoapp.png" alt="Logo PMJ">
     </div>
     <div class="app-title">
-      <h4><strong>Apotek-KU</strong></h4>
       <h5>Sistem Informasi</h5>
       <h6><strong>Penjualan Obat</strong></h6>
     </div>
@@ -135,9 +134,9 @@
     </div>
 
     <hr>
-    <div class="text-center text-muted" style="font-size: 13px;">
-      &copy; PMJ - Reserse Siber<br>
-      Info Trouble: <strong>M. Wira</strong> - <a href="tel:+6282177856209">0821-7785-6209</a>
+    <div class="text-center text-muted" style="font-size: 13px;">wira
+      &copy; Apotek<br>
+      Info Trouble: <strong>M. Wira</strong> - <a href="tel:+6282177856209">0821-7786-6209</a>
     </div>
   </div>
 
