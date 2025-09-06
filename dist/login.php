@@ -1,3 +1,52 @@
+<?php
+session_start();
+include 'koneksi.php'; // pastikan koneksi ke DB
+
+if($_SERVER['REQUEST_METHOD'] === 'POST'){
+    $nik = $_POST['nik'] ?? '';
+    $password = $_POST['password'] ?? '';
+
+    if(empty($nik) || empty($password)){
+        $_SESSION['flash_error'] = "NIK dan password harus diisi!";
+        header("Location: login.php");
+        exit;
+    }
+
+    // Ambil user dari database
+    $stmt = $conn->prepare("SELECT id, nama, password FROM pengguna WHERE nik = ?");
+    $stmt->bind_param("s", $nik);
+    $stmt->execute();
+    $stmt->store_result();
+
+    if($stmt->num_rows === 0){
+        $_SESSION['flash_error'] = "NIK tidak ditemukan!";
+        header("Location: login.php");
+        exit;
+    }
+
+    $stmt->bind_result($user_id, $nama_user, $hash_password);
+    $stmt->fetch();
+
+    // Cek password
+if(!password_verify($password, $hash_password)){
+    $_SESSION['flash_error'] = "Password salah!";
+    header("Location: login.php"); // perbaiki dari transaksi_penjualan.php
+    exit;
+}
+
+
+    // Login sukses: simpan session
+    $_SESSION['user_id'] = $user_id;
+    $_SESSION['nama_user'] = $nama_user;
+
+    // Redirect ke halaman transaksi
+    header("Location: transaksi.php");
+    exit;
+}
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
