@@ -16,10 +16,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // verifikasi password
         if (password_verify($password, $user['password'])) {
             // buat session login
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['nik']     = $user['nik'];
-            $_SESSION['nama']    = $user['nama'];
-            $_SESSION['email']   = $user['email'];
+            $_SESSION['user_id']   = $user['id'];
+            $_SESSION['nama_user'] = $user['nama'];  // ubah dari 'nama' jadi 'nama_user'
+            $_SESSION['nik']       = $user['nik'];
+            $_SESSION['email']     = $user['email'];
 
             // redirect ke dashboard
             header("Location: dashboard.php");

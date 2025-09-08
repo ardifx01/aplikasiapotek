@@ -22,17 +22,20 @@ $user_id = $_SESSION['user_id'] ?? 0;
         <a href="dashboard.php" class="nav-link"><i class="fas fa-home"></i> <span>Dashboard</span></a>
       </li>
 
-      <!-- Master Data -->
-      <li class="menu-header">Master Data</li>
-      <li class="dropdown">
-        <a href="#" class="nav-link has-dropdown"><i class="fas fa-capsules"></i> <span>Obat</span></a>
-        <ul class="dropdown-menu">
-          <li><a class="nav-link" href="data_obat.php">Daftar Obat</a></li>
-          <li><a class="nav-link" href="suplier.php">Suplier</a></li>
-          <li><a class="nav-link" href="kategori_obat.php">Kategori Obat</a></li>
-          <li><a class="nav-link" href="stok_obat.php">Stok Obat</a></li>
-        </ul>
-      </li>
+     <!-- Master Data -->
+<li class="menu-header">Master Data</li>
+<li class="dropdown">
+  <a href="#" class="nav-link has-dropdown">
+    <i class="fas fa-pills"></i> <span>Stok Obat</span>
+  </a>
+  <ul class="dropdown-menu">
+    <li><a class="nav-link" href="data_obat.php"><i class="fas fa-list"></i> Daftar Obat</a></li>
+    <li><a class="nav-link" href="suplier.php"><i class="fas fa-truck"></i> Suplier</a></li>
+    <li><a class="nav-link" href="kategori_obat.php"><i class="fas fa-tags"></i> Kategori Obat</a></li>
+    <li><a class="nav-link" href="stok_obat.php"><i class="fas fa-dolly"></i> Obat Masuk</a></li>
+  </ul>
+</li>
+
 
       <!-- Penjualan -->
       <li class="menu-header">Transaksi</li>

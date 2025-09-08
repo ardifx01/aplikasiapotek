@@ -17,15 +17,16 @@ function set_active_tab($tab){
 
 // Proses Simpan Stok Masuk
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $aksi        = $_POST['aksi'] ?? '';
-    $id_obat     = isset($_POST['id_obat']) ? (int) $_POST['id_obat'] : 0;
-    $id_supplier = isset($_POST['id_supplier']) ? (int) $_POST['id_supplier'] : 0;
-    $jumlah      = isset($_POST['jumlah']) ? (int) $_POST['jumlah'] : 0;
-    $harga_beli  = isset($_POST['harga_beli']) ? (float) $_POST['harga_beli'] : 0;
-    $tanggal     = $_POST['tanggal'] ?? date('Y-m-d');
-    $cara_bayar  = $_POST['cara_bayar'] ?? '';
-    $jatuh_tempo = $_POST['jatuh_tempo'] ?: null;
-    $keterangan  = trim($_POST['keterangan'] ?? '');
+    $aksi             = $_POST['aksi'] ?? '';
+    $id_obat          = isset($_POST['id_obat']) ? (int) $_POST['id_obat'] : 0;
+    $id_supplier      = isset($_POST['id_supplier']) ? (int) $_POST['id_supplier'] : 0;
+    $jumlah           = isset($_POST['jumlah']) ? (int) $_POST['jumlah'] : 0;
+    $harga_beli       = isset($_POST['harga_beli']) ? (float) $_POST['harga_beli'] : 0;
+    $tanggal          = $_POST['tanggal'] ?? date('Y-m-d');
+    $tanggal_kadaluwarsa = $_POST['tanggal_kadaluwarsa'] ?: null;
+    $cara_bayar       = $_POST['cara_bayar'] ?? '';
+    $jatuh_tempo      = $_POST['jatuh_tempo'] ?: null;
+    $keterangan       = trim($_POST['keterangan'] ?? '');
 
     if($id_obat <= 0 || $id_supplier <= 0 || $jumlah <= 0 || $harga_beli <= 0){
         set_flash("❌ Semua field wajib diisi dengan benar.");
@@ -37,9 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $total = $jumlah * $harga_beli;
 
     $stmt = $conn->prepare("INSERT INTO stok_masuk 
-        (tanggal_masuk, id_obat, id_supplier, jumlah, harga_beli, total, cara_bayar, jatuh_tempo, keterangan)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("siiiddsss", $tanggal, $id_obat, $id_supplier, $jumlah, $harga_beli, $total, $cara_bayar, $jatuh_tempo, $keterangan);
+        (tanggal_masuk, id_obat, id_supplier, jumlah, harga_beli, total, cara_bayar, jatuh_tempo, tanggal_kadaluwarsa, keterangan)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("siiiddssss", $tanggal, $id_obat, $id_supplier, $jumlah, $harga_beli, $total, $cara_bayar, $jatuh_tempo, $tanggal_kadaluwarsa, $keterangan);
 
     if($stmt->execute()){
         // --- Ambil stok lama dan harga beli lama ---
@@ -133,7 +134,11 @@ unset($_SESSION['active_tab']);
                         <label>Tanggal Masuk</label>
                         <input type="date" name="tanggal" class="form-control" value="<?= date('Y-m-d') ?>" required>
                       </div>
-                      <div class="form-group col-md-5">
+                      <div class="form-group col-md-3">
+                        <label>Tanggal Kadaluwarsa</label>
+                        <input type="date" name="tanggal_kadaluwarsa" class="form-control">
+                      </div>
+                      <div class="form-group col-md-4">
                         <label>Obat</label>
                         <select name="id_obat" class="form-control" required>
                           <option value="">-- Pilih Obat --</option>
@@ -145,7 +150,7 @@ unset($_SESSION['active_tab']);
                           <?php endwhile; ?>
                         </select>
                       </div>
-                      <div class="form-group col-md-4">
+                      <div class="form-group col-md-2">
                         <label>Supplier</label>
                         <select name="id_supplier" class="form-control" required>
                           <option value="">-- Pilih Supplier --</option>
@@ -202,7 +207,8 @@ unset($_SESSION['active_tab']);
                       <thead class="thead-dark">
                         <tr>
                           <th>No</th>
-                          <th>Tanggal</th>
+                          <th>Tanggal Masuk</th>
+                          <th>Tanggal Kadaluwarsa</th>
                           <th>Obat</th>
                           <th>Supplier</th>
                           <th>Jumlah</th>
@@ -226,6 +232,7 @@ unset($_SESSION['active_tab']);
                         <tr>
                           <td><?= $no++; ?></td>
                           <td><?= date('d-m-Y', strtotime($row['tanggal_masuk'])) ?></td>
+                          <td><?= $row['tanggal_kadaluwarsa'] ? date('d-m-Y', strtotime($row['tanggal_kadaluwarsa'])) : '-' ?></td>
                           <td><?= htmlspecialchars($row['nama_obat']) ?></td>
                           <td><?= htmlspecialchars($row['supplier']) ?></td>
                           <td><?= $row['jumlah'] ?></td>
