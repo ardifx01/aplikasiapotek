@@ -127,7 +127,6 @@ $satuan_list   = mysqli_query($conn, "SELECT nama_satuan FROM master_satuan ORDE
     <th>Satuan</th>
     <th>Harga Beli</th>
     <th>Harga Jual</th>
-    <th>Stok</th>
     <th>Tanggal Kadaluwarsa</th>
     <th>Jatuh Tempo</th>
     <th>Aksi</th>
@@ -186,7 +185,6 @@ echo "<tr>
     data-satuan='".$row['satuan']."'
     data-beli='".$row['harga_beli']."'
     data-jual='".$row['harga_jual']."'
-    data-stok='".$row['stok']."'
     data-kadaluwarsa='".$row['tanggal_kadaluwarsa']."'
     data-jatuhtempo='".$row['jatuh_tempo']."'>
     <i class='fas fa-edit'></i>

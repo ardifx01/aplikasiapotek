@@ -25,11 +25,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: dashboard.php");
             exit;
         } else {
-            echo "<script>alert('Password salah!'); window.location.href='index.php';</script>";
+            echo "<script>alert('Password salah!'); window.location.href='login.php';</script>";
             exit;
         }
     } else {
-        echo "<script>alert('NIK tidak ditemukan!'); window.location.href='index.php';</script>";
+        echo "<script>alert('NIK tidak ditemukan!'); window.location.href='login.php';</script>";
         exit;
     }
 } else {

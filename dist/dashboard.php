@@ -35,7 +35,6 @@ if (!isset($_SESSION['user_id'])) {
         </section>
       </div>
 
-      <?php include 'footer.php'; ?>
     </div>
   </div>
 
