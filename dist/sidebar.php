@@ -35,7 +35,6 @@ $nama_apotek = $profil['nama'] ?? 'Apotek-KU';
         <ul class="dropdown-menu">
           <li><a class="nav-link" href="data_obat.php"><i class="fas fa-list"></i> Daftar Obat</a></li>
           <li><a class="nav-link" href="suplier.php"><i class="fas fa-truck"></i> Suplier</a></li>
-          <li><a class="nav-link" href="kategori_obat.php"><i class="fas fa-tags"></i> Kategori Obat</a></li>
           <li><a class="nav-link" href="stok_obat.php"><i class="fas fa-dolly"></i> Obat Masuk</a></li>
         </ul>
       </li>
@@ -46,7 +45,7 @@ $nama_apotek = $profil['nama'] ?? 'Apotek-KU';
         <a href="#" class="nav-link has-dropdown"><i class="fas fa-shopping-cart"></i> <span>Penjualan</span></a>
         <ul class="dropdown-menu">
           <li><a class="nav-link" href="transaksi_penjualan.php">Transaksi Penjualan</a></li>
-          <li><a class="nav-link" href="riwayat_penjualan.php">Riwayat Penjualan</a></li>
+          <li><a class="nav-link" href="operasional.php">Biaya Operasional</a></li>
         </ul>
       </li>
 
@@ -56,7 +55,8 @@ $nama_apotek = $profil['nama'] ?? 'Apotek-KU';
         <a href="#" class="nav-link has-dropdown"><i class="fas fa-file-alt"></i> <span>Laporan</span></a>
         <ul class="dropdown-menu">
           <li><a class="nav-link" href="laporan_penjualan.php">Laporan Penjualan</a></li>
-          <li><a class="nav-link" href="laporan_stok.php">Laporan Stok Obat</a></li>
+          <li><a class="nav-link" href="laporan_hutang.php">Laporan Hutang</a></li>
+          <li><a class="nav-link" href="laporan_laba_rugi.php">Laporan Laba Rugi</a></li>
         </ul>
       </li>
 

@@ -15,8 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aksi'])) {
     $nama_obat  = mysqli_real_escape_string($conn, $_POST['nama_obat']);
     $kategori   = mysqli_real_escape_string($conn, $_POST['kategori']);
     $satuan     = mysqli_real_escape_string($conn, $_POST['satuan']);
-    $harga_beli = (float) $_POST['harga_beli'];
-    $harga_jual = (float) $_POST['harga_jual'];
+    $harga_beli = (int) $_POST['harga_beli'];
+    $harga_jual = (int) $_POST['harga_jual'];
     $stok       = (int) $_POST['stok'];
     $tanggal_kadaluwarsa = $_POST['tanggal_kadaluwarsa'] ?: null;
     $jatuh_tempo         = $_POST['jatuh_tempo'] ?: null;
@@ -25,17 +25,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aksi'])) {
         $stmt = $conn->prepare("INSERT INTO obat 
             (kode_obat, nama_obat, kategori, satuan, harga_beli, harga_jual, stok, tanggal_kadaluwarsa, jatuh_tempo) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssddisss", $kode_obat, $nama_obat, $kategori, $satuan, $harga_beli, $harga_jual, $stok, $tanggal_kadaluwarsa, $jatuh_tempo);
+        // Perbaikan tipe param: satuan = string
+        $stmt->bind_param("ssssiiiss", $kode_obat, $nama_obat, $kategori, $satuan, $harga_beli, $harga_jual, $stok, $tanggal_kadaluwarsa, $jatuh_tempo);
         $stmt->execute();
         $stmt->close();
     } elseif ($aksi === 'edit') {
         $stmt = $conn->prepare("UPDATE obat SET 
             kode_obat=?, nama_obat=?, kategori=?, satuan=?, harga_beli=?, harga_jual=?, stok=?, tanggal_kadaluwarsa=?, jatuh_tempo=? 
             WHERE id=?");
-        $stmt->bind_param("sssddisssi", $kode_obat, $nama_obat, $kategori, $satuan, $harga_beli, $harga_jual, $stok, $tanggal_kadaluwarsa, $jatuh_tempo, $id);
+        // Perbaikan tipe param: satuan = string
+        $stmt->bind_param("ssssiiissi", $kode_obat, $nama_obat, $kategori, $satuan, $harga_beli, $harga_jual, $stok, $tanggal_kadaluwarsa, $jatuh_tempo, $id);
         $stmt->execute();
         $stmt->close();
     }
+
     header("Location: data_obat.php");
     exit;
 }
@@ -61,6 +64,7 @@ $obat = mysqli_query($conn, "SELECT * FROM obat ORDER BY nama_obat ASC");
 $kategori_list = mysqli_query($conn, "SELECT nama_kategori FROM master_kategori ORDER BY nama_kategori ASC");
 $satuan_list   = mysqli_query($conn, "SELECT nama_satuan FROM master_satuan ORDER BY nama_satuan ASC");
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -127,6 +131,7 @@ $satuan_list   = mysqli_query($conn, "SELECT nama_satuan FROM master_satuan ORDE
     <th>Satuan</th>
     <th>Harga Beli</th>
     <th>Harga Jual</th>
+    <th>Stok Obat</th>
     <th>Tanggal Kadaluwarsa</th>
     <th>Jatuh Tempo</th>
     <th>Aksi</th>
@@ -177,7 +182,7 @@ echo "<tr>
 <td class='$expiredClass'>".($row['tanggal_kadaluwarsa'] ? date('d-m-Y', strtotime($row['tanggal_kadaluwarsa'])) : '-')."</td>
 <td class='$jatuhTempoClass'>".($row['jatuh_tempo'] ? date('d-m-Y', strtotime($row['jatuh_tempo'])) : '-')."</td>
 <td>
-  <button class='btn btn-warning btn-sm btn-edit'
+ <button class='btn btn-warning btn-sm btn-edit'
     data-id='".$row['id']."'
     data-kode='".$row['kode_obat']."'
     data-nama='".$row['nama_obat']."'
@@ -185,10 +190,12 @@ echo "<tr>
     data-satuan='".$row['satuan']."'
     data-beli='".$row['harga_beli']."'
     data-jual='".$row['harga_jual']."'
+    data-stok='".$row['stok']."'
     data-kadaluwarsa='".$row['tanggal_kadaluwarsa']."'
     data-jatuhtempo='".$row['jatuh_tempo']."'>
     <i class='fas fa-edit'></i>
-  </button>
+</button>
+
   <a href='data_obat.php?hapus=".$row['id']."' class='btn btn-danger btn-sm' onclick=\"return confirm('Yakin hapus obat ini?');\">
     <i class='fas fa-trash'></i>
   </a>

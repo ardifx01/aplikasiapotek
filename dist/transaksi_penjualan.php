@@ -39,8 +39,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['aksi'] ?? '') === 'simpan'
     try {
         $conn->begin_transaction();
 
-        $stmt_master = $conn->prepare("INSERT INTO penjualan_master (tanggal, total, user_id, nama_petugas, uang_diterima) VALUES (NOW(), ?, ?, ?, ?)");
-        $stmt_master->bind_param("disd", $total_transaksi, $user_id, $nama_petugas, $uang_diterima);
+  $kode_penjualan = 'TRX' . date('YmdHis'); // TRX + timestamp
+
+$stmt_master = $conn->prepare("INSERT INTO penjualan_master (kode_penjualan, tanggal, total, user_id, nama_petugas, uang_diterima) VALUES (?, NOW(), ?, ?, ?, ?)");
+$stmt_master->bind_param("sdisd", $kode_penjualan, $total_transaksi, $user_id, $nama_petugas, $uang_diterima);
+
+
+
+
         $stmt_master->execute();
         $penjualan_id = $stmt_master->insert_id;
         $stmt_master->close();
@@ -328,12 +334,15 @@ $('#simpan_cetak').click(function(){
     let totalBelanja = cart.reduce((a,b)=>a+b.total,0);
     if(uang_diterima < totalBelanja){ alert('Uang diterima kurang!'); return; }
 
-    $.post('transaksi_penjualan.php', {aksi:'simpan', cart:JSON.stringify(cart), uang_diterima}, function(res){
-        alert('Transaksi berhasil! ID: '+res);
-        cart=[]; renderCart();
-        $('#uang_diterima').val('0'); $('#kembalian').text('Rp 0,-'); $('#modalPenjualan').modal('hide');
-        loadData();
-    }).fail(function(xhr){ alert('Gagal simpan: '+xhr.responseText); });
+ $.post('transaksi_penjualan.php', {aksi:'simpan', cart:JSON.stringify(cart), uang_diterima}, function(res){
+    alert('Transaksi berhasil! ID: '+res);
+    cart=[]; renderCart();
+    $('#uang_diterima').val('0'); $('#kembalian').text('Rp 0,-'); 
+    $('#modalPenjualan').modal('hide');
+    window.open('nota_penjualan.php?id='+res,'_blank'); // Buka nota penjualan
+    loadData();
+}).fail(function(xhr){ alert('Gagal simpan: '+xhr.responseText); });
+
 });
 
 // Load data
